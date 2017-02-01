@@ -15,3 +15,10 @@ class Tweet:
     self.dateTime = datetime.strptime(dateTime,'%Y-%m-%d %H:%M:%S')
     self.tf = {}
     self.tfidf = {}
+
+  def has_word(self, targetWord):
+    words = self.content.split(' ')
+    for word in words:
+      if word == targetWord:
+        return True
+    return False
