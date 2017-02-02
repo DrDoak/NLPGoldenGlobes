@@ -48,11 +48,7 @@ def exclude_all_match(tweets, patterns):
         break
   return matched_tweets
 
-# import tweet
-# t1 = tweet.Tweet("", "Jimmy hosts the Oscars",9,'',9,'2017-01-09 23:59:55')
-# t2 = tweet.Tweet("", "Jimmy hosted the Oscars",9,'',9,'2017-01-09 23:59:55')
-
-# vals = any_match([t1,t2], [r'\bhost.*\b'])
-
-# for v in vals:
-#   print v.content
+def downcase(tweets, strings):
+  for tweet in tweets:
+    for string in strings:
+      tweet.content = re.sub(r'\b'+re.escape(string)+r'\b', string.lower(), tweet.content)
