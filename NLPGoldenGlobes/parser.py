@@ -1,7 +1,6 @@
 from tweet import Tweet
 from query import Query
 import nltk
-import re as regex
 from nltk.corpus import stopwords
 import string
 
