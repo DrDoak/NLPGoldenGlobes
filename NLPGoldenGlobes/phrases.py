@@ -73,6 +73,17 @@ def remove_stopwords(phrases_dict):
       del phrases_dict[phrase]
   return phrases_dict
 
+def remove_tokens(phrases_dict,tokens):
+  for phrase in phrases_dict.keys():
+    remove_phrase = False
+    for word in phrase:
+      for token in tokens:
+        if token.lower() == word.lower():
+          remove_phrase = True
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict
+
 def remove_twitter_stopwords(phrases_dict):
   for phrase in phrases_dict.keys():
     remove_phrase = False
