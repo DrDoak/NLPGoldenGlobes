@@ -23,13 +23,12 @@ def parse_tweets(inputFileName):
 	return list_tweets
 
 def parse_queries(inputFileName):
-	global stops
 	list_queries = []
 	with open(inputFileName, 'r') as datasource:
 		for query in datasource:
 			tokens = nltk.word_tokenize(query)
 			filtered_words = [word for word in tokens if word not in stops and word not in string.punctuation]
-			new_query = Query(query, filtered_words)
+			new_query = Query(query.rstrip(), filtered_words)
 			list_queries.append(new_query)
 	return list_queries
 

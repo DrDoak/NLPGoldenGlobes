@@ -1,6 +1,10 @@
 import nltk
 from nltk.util import ngrams
+from nltk.corpus import stopwords
 import string
+
+stops = set(stopwords.words('english'))
+twitter_stops = ['rt', 'http', 'https', 'goldenglobes']
 
 def extract_unigrams(tweets):
   phrases_dict = phrase_count(tweets, 1)
@@ -45,4 +49,38 @@ def remove_query_type(phrases_dict, queries):
   for i in remove:
     phrases_dict.pop(i, None)
   return phrases_dict
+
+def remove_query(phrases_dict, query):
+  for phrase in phrases_dict.keys():
+    remove_phrase = False
+    for word in phrase:
+      for token in query.tokens:
+        if token.lower() == word.lower():
+          remove_phrase = True
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict
+
+# only remove if entire phrase is stopwords
+def remove_stopwords(phrases_dict):
+  for phrase in phrases_dict.keys():
+    remove_phrase = True
+    for word in phrase:
+      if word.lower() not in stops:
+        remove_phrase = False
+        break
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict
+
+def remove_twitter_stopwords(phrases_dict):
+  for phrase in phrases_dict.keys():
+    remove_phrase = False
+    for word in phrase:
+      if word.lower() in twitter_stops:
+        remove_phrase = True
+        break
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict  
     
