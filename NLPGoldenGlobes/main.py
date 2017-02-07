@@ -1,17 +1,10 @@
 import parser
-import result
+import interpreter
 
-def main_function(awardFile, tweetsFile):
-	allResults = []
-	list_tweets = parse_tweets(tweetsFile)
-	list_awards = parse_awards(awardFile)
+def run_queries(tweets_file, queries_file):
+  tweets = parser.parse_tweets(tweets_file)
+  queries = parser.parse_queries(queries_file)
+  winners = interpreter.get_winners(tweets, queries)
 
-	for award in list_awards:
-		winner = get_Winner(award,list_tweets) #winner will resurn 
-		new_result = Result(award.unparsed,winner)
-		new_result.prettyprint()
-		allResults.append(new_result)
-	return allResults
-
-def get_Winner(award, list_tweets): 
-	pass
+  for winner in winners:
+    winner.prettyprint()
