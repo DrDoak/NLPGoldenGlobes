@@ -16,7 +16,12 @@ def extract_ngrams(tweets):
     phrases_dict = phrase_count(tweets, i)
     phrases_dict = remove_punctuation(phrases_dict)
     all_phrases_dict.update(phrases_dict)
-  return all_phrases_dict 
+  return all_phrases_dict
+
+def extract_xgrams(tweets,x):
+  phrases_dict = phrase_count(tweets,x)
+  phrases_dict = remove_punctuation(phrases_dict)
+  return phrases_dict
 
 #extracts phrases
 def phrase_count(tweets, length):
