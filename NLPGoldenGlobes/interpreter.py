@@ -3,6 +3,7 @@ import phrases
 from collections import Counter
 from result import Result
 
+ngram_threshold = 0.75
 xgram_threshold = 0.75
 
 def get_winners(tweets, queries):
@@ -50,6 +51,7 @@ def get_winners(tweets, queries):
 
 def get_winners_xgrams(tweets, queries):
   results = []
+  queries_set = create_queries_set(queries)
 
   for query in queries:
     matched_tweets = regex.all_match(tweets, query.get_patterns())
@@ -60,7 +62,7 @@ def get_winners_xgrams(tweets, queries):
     xgrams = []
     xgrams_count = []
     for ii in range(1,6):
-      xgrams.append(phrases.extract_xgrams(matched_tweets,ii))
+      xgrams.append(phrases.extract_xgrams(matched_tweets_minus_other_queries,ii))
 
     for x in xgrams:
       phrases.remove_query(x,query)

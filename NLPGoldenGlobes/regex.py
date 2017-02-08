@@ -52,3 +52,9 @@ def downcase(tweets, strings):
   for tweet in tweets:
     for string in strings:
       tweet.content = re.sub(r'\b'+re.escape(string)+r'\b', string.lower(), tweet.content)
+
+def create_patterns(tokens):
+  patterns = []
+  for token in tokens:
+    patterns.append(r'(?i)\b' + re.escape(token) + r'\b')
+  return patterns
