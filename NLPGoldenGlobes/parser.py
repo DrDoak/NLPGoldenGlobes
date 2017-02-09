@@ -36,12 +36,12 @@ def parse_result(results):
 	list_result = []
 	for result in results:
 		tokens = nltk.word_tokenize(result.value)
-		print tokens
-		tokens += nltk.word_tokenize(result.title)
+		excludes = nltk.word_tokenize(result.title)
 
 		print tokens
 		filtered_words = [word for word in tokens if word not in stops and word not in string.punctuation]
-		new_query = Query(result.title.rstrip(), filtered_words)
+		filtered_excludes = [word for word in excludes if word not in stops and word not in string.punctuation]
+		new_query = Query(result.title.rstrip(), filtered_words,excludes)
 		list_result.append(new_query)
 	return list_result
 

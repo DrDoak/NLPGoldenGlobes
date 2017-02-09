@@ -61,6 +61,18 @@ def remove_query(phrases_dict, query):
       del phrases_dict[phrase]
   return phrases_dict
 
+def remove_excludes(phrases_dict, query):
+  for phrase in phrases_dict.keys():
+    remove_phrase = False
+    for word in phrase:
+      for token in query.excludewords:
+        if token.lower() == word.lower():
+          remove_phrase = True
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict
+
+
 # only remove if entire phrase is stopwords
 def remove_stopwords(phrases_dict):
   for phrase in phrases_dict.keys():

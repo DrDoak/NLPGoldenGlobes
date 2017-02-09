@@ -1,9 +1,10 @@
 import re
 
 class Query:
-  def __init__(self,unparsed, tokens):
+  def __init__(self,unparsed, tokens,excludewords=[]):
     self.unparsed = unparsed
     self.tokens = tokens
+    self.excludewords = excludewords
 
   def get_patterns(self):
     patterns = []

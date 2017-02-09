@@ -60,6 +60,9 @@ def get_presenters(tweets, queries,category):
     phrases.remove_query(unigrams, winner)
     phrases.remove_query(ngrams, winner)
 
+    phrases.remove_excludes(unigrams, winner)
+    phrases.remove_excludes(ngrams, winner)
+
     phrases.remove_query(unigrams, category)
     phrases.remove_query(ngrams, category)
 
@@ -71,7 +74,7 @@ def get_presenters(tweets, queries,category):
 
     unigrams_count = Counter(unigrams)
     ngrams_count = Counter(ngrams)
-    import pdb;pdb.set_trace()
+    #import pdb;pdb.set_trace()
     
     if unigrams_count and ngrams_count:
       max_unigram = unigrams_count.most_common(1)[0]
