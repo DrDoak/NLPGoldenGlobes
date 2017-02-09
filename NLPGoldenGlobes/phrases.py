@@ -5,6 +5,7 @@ import string
 
 stops = set(stopwords.words('english'))
 twitter_stops = ['rt', 'http', 'https', 'goldenglobes']
+punctuation = set(string.punctuation)
 
 def extract_unigrams(tweets):
   phrases_dict = phrase_count(tweets, 1)
@@ -39,7 +40,7 @@ def remove_punctuation(phrases_dict):
   remove = [] 
   for phrase in phrases_dict:
     for word in phrase:
-      if word in string.punctuation:
+      if all(char in punctuation for char in word):
         remove.append(phrase)
   for i in remove:
     phrases_dict.pop(i, None)

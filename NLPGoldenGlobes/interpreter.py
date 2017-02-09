@@ -4,7 +4,7 @@ from collections import Counter
 from result import Result
 
 ngram_threshold = 0.75
-xgram_threshold = 0.75
+xgram_threshold = 0.5
 
 def get_winners(tweets, queries):
   results = []
@@ -75,15 +75,9 @@ def get_winners_xgrams(tweets, queries):
       for ii in range(0,5):
         max_xgrams.append(xgrams_count[ii].most_common(5))
       for ii in range(0,5):
-        if ii < 4 and max_xgrams[ii][0][1] >= 2*max_xgrams[ii+1][0][1]:
-          #print max_xgrams[ii]
+        if ii < 4 and xgram_threshold * max_xgrams[ii][0][1] > max_xgrams[ii+1][0][1]:
           winner = ' '.join(max_xgrams[ii][0][0])
           break
-        #subsets
-        elif ii < 4 and is_subset(xgrams[ii],xgrams[ii+1]):
-          continue
-        elif ii < 4 and max_xgrams[ii+1][0][1] > max_xgrams[ii][0][1]*xgram_threshold:
-          continue
         else:
           winner = ' '.join(max_xgrams[ii][0][0])
 
