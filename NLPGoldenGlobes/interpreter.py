@@ -2,9 +2,11 @@ import regex
 import phrases
 from collections import Counter
 from result import Result
+import string
 
 ngram_threshold = 0.75
-xgram_threshold = 0.5
+xgram_threshold = 0.49
+mention_hashtag_weight = 0.15
 
 def get_winners(tweets, queries):
   results = []
@@ -73,7 +75,12 @@ def get_winners_xgrams(tweets, queries):
     if len(xgrams_count) > 4:
       max_xgrams=[]
       for ii in range(0,5):
-        max_xgrams.append(xgrams_count[ii].most_common(5))
+        max_xgrams.append(xgrams_count[ii].most_common(20))
+
+      for unigram in max_xgrams[0]:
+        for ii in range(1,5):
+          add_mention_hashtag_count(unigram, max_xgrams[ii], mention_hashtag_weight)
+
       for ii in range(0,5):
         if ii < 4 and xgram_threshold * max_xgrams[ii][0][1] > max_xgrams[ii+1][0][1]:
           winner = ' '.join(max_xgrams[ii][0][0])
@@ -99,3 +106,15 @@ def create_queries_set(queries):
   for query in queries:
     queries_set.update(query.tokens)
   return queries_set
+
+def add_mention_hashtag_count(unigram, ngrams, weight):
+  unigram_phrase = unigram[0][0].lower()
+  unigram_count = unigram[1]
+
+  for idx, ngram in enumerate(ngrams):
+    ngram_phrase = ''.join(ngram[0]).lower().translate(None, string.punctuation)
+    ngram_count = ngram[1]
+    if unigram_phrase == ngram_phrase:
+      updated_count = ngram_count + weight * unigram_count
+      updated_ngram = (ngram[0], updated_count)
+      ngrams[idx] = updated_ngram
