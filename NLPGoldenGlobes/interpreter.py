@@ -1,12 +1,22 @@
 import regex
 import phrases
-from collections import Counter
+import names
 from result import Result
+from collections import Counter
+
+host_tokens = ['host', 'hosts', 'hosting', 'hosted']
 
 ngram_threshold = 0.49
 mention_hashtag_weight = 0.15
 stopword_threshold = 20
 stopword_weight = 0.6
+
+def get_host(tweets):
+  host_patterns = regex.create_patterns(host_tokens)
+  matched_tweets = regex.any_match(tweets, host_patterns)
+  host = names.most_frequent_name(matched_tweets)
+  host_result = Result('Host', host)
+  return host_result
 
 def get_winners(tweets, queries):
   results = []
