@@ -3,9 +3,14 @@ import phrases
 from collections import Counter
 from result import Result
 import string
+from nltk.corpus import stopwords
 
 xgram_threshold = 0.49
 mention_hashtag_weight = 0.15
+stopword_threshold = 20
+stopword_weight = 0.6
+
+stops = set(stopwords.words('english'))
 
 def get_winners(tweets, queries):
   results = []
@@ -37,6 +42,13 @@ def get_winners(tweets, queries):
         for ii in range(1,5):
           add_mention_hashtag_count(unigram, max_xgrams[ii], mention_hashtag_weight)
 
+      if max_xgrams[0][0][1] < stopword_threshold:
+        for ngrams in max_xgrams:
+          penalize_stopwords(ngrams, stopword_weight)
+
+      for ngrams in max_xgrams:
+        ngrams.sort(key=lambda x: x[1], reverse=True)
+
       for ii in range(0,5):
         if ii < 4 and xgram_threshold * max_xgrams[ii][0][1] > max_xgrams[ii+1][0][1]:
           winner = ' '.join(max_xgrams[ii][0][0])
@@ -63,5 +75,18 @@ def add_mention_hashtag_count(unigram, ngrams, weight):
     ngram_count = ngram[1]
     if unigram_phrase == ngram_phrase:
       updated_count = ngram_count + weight * unigram_count
+      updated_ngram = (ngram[0], updated_count)
+      ngrams[idx] = updated_ngram
+
+def penalize_stopwords(ngrams, weight):
+  for idx, ngram in enumerate(ngrams):
+    ngram_phrase = ngram[0]
+    ngram_count = ngram[1]
+    stopwords_count = 0
+    for word in ngram_phrase:
+      if word.lower() in stops:
+        stopwords_count += 1
+    if stopwords_count > 0:
+      updated_count = ngram_count * (weight ** stopwords_count)
       updated_ngram = (ngram[0], updated_count)
       ngrams[idx] = updated_ngram
