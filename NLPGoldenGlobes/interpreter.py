@@ -3,7 +3,7 @@ import phrases
 from collections import Counter
 from result import Result
 import parser
-
+import names
 
 ngram_threshold = 0.75
 
@@ -52,7 +52,12 @@ def get_presenters(tweets, queries,category):
   winner_queries = parser.parse_result(winners)
   for winner in winner_queries:
     matched_tweets = regex.all_match(tweets, winner.get_patterns())
-    matched_tweets = regex.all_match(matched_tweets, category.get_patterns())
+    matched_tweets = regex.any_match(matched_tweets, category.get_patterns())
+    print category.tokens
+    print winner.tokens
+    print winner.excludewords
+    print names.count_names(matched_tweets)
+    print names.most_frequent_name(matched_tweets)
 
     unigrams = phrases.extract_unigrams(matched_tweets)
     ngrams = phrases.extract_ngrams(matched_tweets)
@@ -90,5 +95,6 @@ def get_presenters(tweets, queries,category):
         presenter = ' '.join(max_ngram_phrase)
       else:
         presenter = max_unigram_phrase
+
       results.append(Result(winner.unparsed, presenter))
   return results

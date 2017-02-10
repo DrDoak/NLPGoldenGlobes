@@ -3,7 +3,10 @@ import re
 
 def most_frequent_name(tweets):
   names_dict = count_names(tweets)
-  return max(names_dict.iterkeys(), key=lambda key: names_dict[key])
+  if len(tweets) > 0:
+    return max(names_dict.iterkeys(), key=lambda key: names_dict[key])
+  else:
+    return "NONE" 
 
 def count_names(tweets):
   names_dict = {}
