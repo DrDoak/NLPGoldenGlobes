@@ -59,6 +59,42 @@ def get_winners(tweets, queries):
 
   return results
 
+def get_nominees(tweets, queries):
+  for query in queries:
+    if 'Actor' in query.tokens or 'Actress' in query.tokens:
+      get_actor_nominees(tweets, query)
+    elif 'TV' in query.tokens:
+      get_tv_nominees(tweets, query)
+    elif 'Picture' in query.tokens or 'Film' in query.tokens:
+      get_movie_nominees(tweets, query)
+
+
+def get_movie_nominees(tweets, query):
+  movie_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
+  query_tokens = [token for token in query.tokens if token.lower() not in movie_tokens]
+
+  movie_patterns = regex.create_patterns(movie_tokens)
+  query_patterns = regex.create_patterns(query_tokens)
+
+  query_tweets = regex.all_match(tweets, query_patterns)
+  movie_tweets = regex.any_match(query_tweets, movie_tokens)
+  nominee_tweets = regex.any_match(movie_tweets, [r'(?i)nomin'])
+
+  unigrams = phrases.extract_ngrams(nominee_tweets, 1)
+  bigrams = phrases.extract_ngrams(nominee_tweets, 2)
+  trigrams = phrases.extract_ngrams(nominee_tweets, 3)
+
+  uc = Counter(unigrams)
+  bc = Counter(bigrams)
+  tc = Counter(trigrams)
+
+def get_tv_nominees(tweets, query):
+  tv_tokens = ['tv', 'television', 'series']
+
+def get_actor_nominees(tweets, query):
+  actor_tokens = ['actor', 'actress']
+
+
 def create_queries_set(queries):
   queries_set = set()
   for query in queries:
