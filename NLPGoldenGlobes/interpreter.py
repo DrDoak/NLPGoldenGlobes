@@ -44,10 +44,19 @@ def get_winners(tweets, queries):
       results.append(Result(query.unparsed, winner))
   return results
 
+def get_queries(queries):
+  list_optional = ['movie', 'feature','film','tv','televion']
+  list_mandatory = [all tokens in queries.tokens if tokens.lower() not in list_optional]
+  mandatory_patterns = regex.create_patterns(movie_tokens)
+  query_patterns = regex.create
+
+  return None
+
 
 def get_presenters(tweets, queries,category):
   results_w = []
   results_a = []
+  results = []
   winners = get_winners(tweets, queries)
   award_names = []
   print "Finished getting winners"
@@ -57,63 +66,23 @@ def get_presenters(tweets, queries,category):
   for winner in winner_queries:
     matched_tweets = regex.all_match(tweets, winner.get_patterns())
     matched_tweets = regex.any_match(matched_tweets, category.get_patterns())
-		
-	# when you implement queries, make sure to 
-  	#remove winner
-  	#don't do double intersection;rather, merge the results of independent
-    #.getpatterns makes regex patter to match
-    
-    
-    #get query into array, if contains synomym, then remove and split into two different 
-    #regex
-    print category.tokens
-    print winner.tokens
-    print winner.excludewords
-    import pdb; pdb.set_trace
-    print "Length of tweets" + str(len(matched_tweets))
+    #print category.tokens
+    #print winner.tokens
+    #print winner.excludewords
+    #print "Length of tweets" + str(len(matched_tweets))
     dict_names = names.count_names(matched_tweets)
-    print names.most_frequent_name(matched_tweets)
+  #  print names.most_frequent_name(matched_tweets)
     presenter = ' '.join(names.most_frequent_name(matched_tweets))
     if winner in queries:
     	results_a.append(dict_names)
     else:
     	results_w.append(dict_names)
-  for 
-  
+  for i in range(len(results_a)):
+    results_w[i].update(results_a[i])
+    d = Counter(results_w[i])
+    d = d.most_common(3)
+    results.append(d)
+  import pdb; pdb.set_trace()
+  return d
 
-   #  unigrams = phrases.extract_unigrams(matched_tweets)
-#     ngrams = phrases.extract_ngrams(matched_tweets)
-# 
-#     phrases.remove_query(unigrams, winner)
-#     phrases.remove_query(ngrams, winner)
-# 
-#     phrases.remove_excludes(unigrams, winner)
-#     phrases.remove_excludes(ngrams, winner)
-# 
-#     phrases.remove_query(unigrams, category)
-#     phrases.remove_query(ngrams, category)
-# 
-#     phrases.remove_stopwords(unigrams)
-#     phrases.remove_stopwords(ngrams)
-# 
-#     phrases.remove_twitter_stopwords(unigrams)
-#     phrases.remove_twitter_stopwords(ngrams)
-# 
-#     unigrams_count = Counter(unigrams)
-#     ngrams_count = Counter(ngrams)
-#     #import pdb;pdb.set_trace()
-#     
-#     if unigrams_count and ngrams_count:
-#       max_unigram = unigrams_count.most_common(1)[0]
-#       max_ngram = ngrams_count.most_common(1)[0]
-# 
-#       max_unigram_phrase = max_unigram[0][0]
-#       max_unigram_count = max_unigram[1]
-# 
-#       max_ngram_phrase = max_ngram[0]
-#       max_ngram_count = max_ngram[1]
-# 
-#       if (max_unigram_phrase in max_ngram_phrase) or (max_ngram_count > ngram_threshold * max_unigram_count):
-#         presenter = ' '.join(max_ngram_phrase)
-#       else:
-#         presenter = max_unigram_phrase
+
