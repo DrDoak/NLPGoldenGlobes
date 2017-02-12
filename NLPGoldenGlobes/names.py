@@ -24,3 +24,22 @@ def extract_names(text):
   
 def extract_handles(text):
   return re.findall(r'@(\w+)', text)      
+
+def remove_tokens(names_dict, tokens):
+  for name in names_dict.keys():
+    remove_name = False
+    name_parts = name.split()
+    for part in name_parts:
+      for token in tokens:
+        if token.lower() == part.lower():
+          remove_name = True
+          break
+    if remove_name:
+      del names_dict[name]
+  return names_dict
+
+def only_bigrams(names_dict):
+  for name in names_dict.keys():
+    if len(name.split()) != 2:
+      del names_dict[name]
+  return names_dict
