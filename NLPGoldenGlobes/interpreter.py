@@ -71,13 +71,15 @@ def get_presenters(tweets, queries,category):
     print winner.excludewords
     import pdb; pdb.set_trace
     print "Length of tweets" + str(len(matched_tweets))
-    print names.count_names(matched_tweets)
+    dict_names = names.count_names(matched_tweets)
     print names.most_frequent_name(matched_tweets)
+    presenter = ' '.join(names.most_frequent_name(matched_tweets))
     if winner in queries:
-		results_a.append(Result(winner.unparsed, presenter))
+    	results_a.append(dict_names)
     else:
-    	results_w.append(Result(winner.unparsed, presenter))
-	return results_a
+    	results_w.append(dict_names)
+  for 
+  
 
    #  unigrams = phrases.extract_unigrams(matched_tweets)
 #     ngrams = phrases.extract_ngrams(matched_tweets)
