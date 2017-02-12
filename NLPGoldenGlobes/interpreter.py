@@ -9,11 +9,16 @@ ngram_threshold = 0.75
 
 def get_winners(tweets, queries):
   results = []
+  queries_set = create_queries_set(queries)
 
   for query in queries:
     matched_tweets = regex.all_match(tweets, query.get_patterns())
-    unigrams = phrases.extract_unigrams(matched_tweets)
-    ngrams = phrases.extract_ngrams(matched_tweets)
+    other_queries = queries_set.difference(query.tokens)
+    other_queries_patterns = regex.create_patterns(other_queries)
+    matched_tweets_minus_other_queries = regex.exclude_any_match(matched_tweets, other_queries_patterns)
+
+    unigrams = phrases.extract_unigrams(matched_tweets_minus_other_queries)
+    ngrams = phrases.extract_ngrams(matched_tweets_minus_other_queries)
 
     phrases.remove_query(unigrams, query)
     phrases.remove_query(ngrams, query)
@@ -86,3 +91,8 @@ def get_presenters(tweets, queries,category):
   return d
 
 
+def create_queries_set(queries):
+  queries_set = set()
+  for query in queries:
+    queries_set.update(query.tokens)
+  return queries_set
