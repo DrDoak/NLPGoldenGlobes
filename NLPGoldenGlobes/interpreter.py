@@ -69,7 +69,7 @@ def get_nominees(tweets, queries):
       get_movie_nominees(tweets, query)
 
 
-def get_movie_nominees(winners, queries):
+def get_movie_nominees(tweets, queries):
   movie_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
   nomin_tokens = ['nominated', 'nominee', 'nominees', 'nomination', 'should', 'snub', 'lost', 'not', 'beat', 'robbed', 'prediction', 'over', 'better', 'would', 'could', 'hope']
   results = []
