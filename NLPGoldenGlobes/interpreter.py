@@ -62,15 +62,17 @@ def get_presenters(tweets, queries, winners):
   results = []
   for query, winner in zip(queries, winners):
     if 'TV' in query.tokens:
-      # get_tv_presenter(tweets, query, winner)
       tv_tokens = ['tv', 'television', 'series']
       result = presenters_helper(tweets, query, winner, tv_tokens)
       results.append(result)
     elif 'Picture' in query.tokens or 'Film' in query.tokens:
-      # get_movie_presenter(tweets, query, winner)
       movie_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
       result = presenters_helper(tweets, query, winner, movie_tokens)
       results.append(result)
+    else:
+      result = presenters_helper(tweets, query, winner, [])
+      results.append(result)
+
   return results
 
 def presenters_helper(tweets, query, winner, optional_tokens):
