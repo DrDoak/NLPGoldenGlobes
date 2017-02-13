@@ -58,3 +58,9 @@ def create_patterns(tokens):
   for token in tokens:
     patterns.append(r'(?i)\b' + re.escape(token) + r'\b')
   return patterns
+
+def create_patterns_not_whole(tokens):
+  patterns = []
+  for token in tokens:
+    patterns.append(r'(?i)' + re.escape(token))
+  return patterns
