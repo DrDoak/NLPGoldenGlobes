@@ -43,3 +43,9 @@ def only_bigrams(names_dict):
     if len(name.split()) != 2:
       del names_dict[name]
   return names_dict
+
+def only_bigrams_and_trigrams(names_dict):
+  for name in names_dict.keys():
+    if len(name.split()) != 2 and len(name.split()) != 3:
+      del names_dict[name]
+  return names_dict

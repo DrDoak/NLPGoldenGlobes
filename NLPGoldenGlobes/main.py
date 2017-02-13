@@ -8,7 +8,7 @@ def run_queries(tweets_file, queries_file):
   host = interpreter.get_host(tweets)
   winners = interpreter.get_winners(tweets, queries)
   presenters = interpreter.get_presenters(tweets, queries, winners)
-  # nominees = interpreter.get_nominees(tweets, queries)
+  nominees = interpreter.get_nominees(tweets, queries, winners)
 
   print 'Host'
   host.prettyprint()
@@ -21,6 +21,6 @@ def run_queries(tweets_file, queries_file):
   for presenter in presenters:
     presenter.prettyprint()
 
-  # print '\nNominees'
-  # for nominee in nominees:
-  # 	nominee.prettyprint()
+  print '\nNominees'
+  for nominee in nominees:
+    nominee.prettyprint()

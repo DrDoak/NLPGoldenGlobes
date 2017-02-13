@@ -58,15 +58,17 @@ def get_winners(tweets, queries):
 
   return results
 
-def get_nominees(tweets, queries):
-  for query in queries:
+def get_nominees(tweets, queries, winners):
+  results = []
+  for query, winner in zip(queries, winners):
     if 'Actor' in query.tokens or 'Actress' in query.tokens:
-      get_actor_nominees(tweets, query)
-    elif 'TV' in query.tokens:
-      get_tv_nominees(tweets, query)
-    elif 'Picture' in query.tokens or 'Film' in query.tokens:
-      get_movie_nominees(tweets, query)
-
+      result = get_actor_nominees(tweets, query, winner)
+      results.append(result)
+    # elif 'TV' in query.tokens:
+    #   get_tv_nominees(tweets, query)
+    # elif 'Picture' in query.tokens or 'Film' in query.tokens:
+    #   get_movie_nominees(tweets, query)
+  return results
 
 def get_movie_nominees(winners, queries):
   movie_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
@@ -141,8 +143,44 @@ def get_movie_nominees(winners, queries):
 def get_tv_nominees(tweets, query):
   tv_tokens = ['tv', 'television', 'series']
 
-def get_actor_nominees(tweets, query):
-  actor_tokens = ['actor', 'actress']
+def get_actor_nominees(tweets, query, winner):
+  if 'TV' in query.tokens:
+    optional_tokens = ['tv', 'television', 'series']
+  else:
+    optional_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
+
+  query_tokens = [token for token in query.tokens if token.lower() not in optional_tokens]
+
+  optional_patterns = regex.create_patterns_not_whole(optional_tokens)
+  query_patterns = regex.create_patterns_not_whole(query_tokens)
+
+  query_tweets = regex.all_match(tweets, query_patterns)
+  if len(optional_tokens) > 0:
+    optional_tweets = regex.any_match(query_tweets, optional_patterns)
+  else:
+    optional_tweets = query_tweets
+
+  nominee_patterns = [r'(?i)nomin']
+
+  award_nominee_tweets = regex.any_match(optional_tweets, nominee_patterns)
+  award_nominee_names = names.count_names(award_nominee_tweets)
+
+  winner_pattern = regex.create_patterns_not_whole([winner.value])
+  winner_tweets = regex.all_match(tweets, winner_pattern)
+
+  should_patterns = [r'(?i)should', r'(?i)snub', r'(?i)lost', r'(?i)beat', r'(?i)robbed', r'(?i)predict', r'(?i)over', r'(?i)hope']
+  winner_nominee_tweets = regex.any_match(winner_tweets, should_patterns)
+  winner_nominee_names = names.count_names(winner_nominee_tweets)
+
+  nominees_count = Counter(award_nominee_names) + Counter(winner_nominee_names)
+  remove_tokens = optional_tokens + query_tokens + winner.value.split()
+  names.remove_tokens(nominees_count, remove_tokens)
+  names.only_bigrams_and_trigrams(nominees_count)
+
+  top_nominees = nominees_count.most_common(5)
+  top_nominees_list = [name[0] for name in top_nominees]
+  nominees_value = ', '.join(top_nominees_list)
+  return Result(query.unparsed, nominees_value)
 
 def get_presenters(tweets, queries, winners):
   results = []
@@ -178,7 +216,7 @@ def presenters_helper(tweets, query, winner, optional_tokens):
   award_present_tweets = regex.any_match(optional_tweets, present_patterns)
   award_present_names = names.count_names(award_present_tweets)
 
-  winner_pattern = regex.create_patterns([winner.value])
+  winner_pattern = regex.create_patterns_not_whole([winner.value])
   winner_tweets = regex.all_match(tweets, winner_pattern)
 
   winner_present_tweets = regex.any_match(winner_tweets, present_patterns)
