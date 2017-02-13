@@ -56,6 +56,18 @@ def remove_query_type(phrases_dict, queries):
     phrases_dict.pop(i, None)
   return phrases_dict
 
+def remove_keywords(phrases_dict,keywords):
+  remove = [] 
+  for phrase in phrases_dict:
+    for word in phrase:
+      for keyword in keywords:
+        if word.lower()==keyword.lower():
+          remove.append(phrase)
+  for i in remove:
+    phrases_dict.pop(i, None)
+  return phrases_dict
+
+
 def remove_query(phrases_dict, query):
   for phrase in phrases_dict.keys():
     remove_phrase = False

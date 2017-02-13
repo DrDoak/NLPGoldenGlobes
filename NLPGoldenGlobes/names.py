@@ -31,8 +31,6 @@ def n_most_common_names(names_dict, n):
     names_dict.pop(most_pop)
     n -= 1
   return names
-
-
   
 def extract_handles(text):
   return re.findall(r'@(\w+)', text)      
@@ -53,6 +51,12 @@ def remove_tokens(names_dict, tokens):
 def only_bigrams(names_dict):
   for name in names_dict.keys():
     if len(name.split()) != 2:
+      del names_dict[name]
+  return names_dict
+
+def only_bigrams_and_trigrams(names_dict):
+  for name in names_dict.keys():
+    if len(name.split()) != 2 and len(name.split()) != 3:
       del names_dict[name]
   return names_dict
 
