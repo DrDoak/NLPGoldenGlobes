@@ -55,3 +55,9 @@ def only_bigrams(names_dict):
     if len(name.split()) != 2:
       del names_dict[name]
   return names_dict
+
+def no_monograms(names_dict):
+  for name in names_dict.keys():
+    if len(name.split()) == 1:
+      del names_dict[name]
+  return names_dict
