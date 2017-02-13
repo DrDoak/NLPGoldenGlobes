@@ -102,6 +102,17 @@ def remove_twitter_stopwords(phrases_dict):
       del phrases_dict[phrase]
   return phrases_dict
 
+def remove_words(phrases_dict, to_remove):
+  for phrase in phrases_dict.keys():
+    remove_phrase = False
+    for word in phrase:
+      if word.lower() in to_remove:
+        remove_phrase = True
+        break
+    if remove_phrase:
+      del phrases_dict[phrase]
+  return phrases_dict
+
 def add_mention_hashtag_count(unigram, ngrams, weight):
   unigram_phrase = unigram[0][0].lower()
   unigram_count = unigram[1]
