@@ -1,5 +1,6 @@
 import nltk
 import re
+import operator
 
 def most_frequent_name(tweets):
   names_dict = count_names(tweets)
@@ -21,6 +22,17 @@ def extract_names(text):
         if chunk.label() == 'PERSON':
           names.append(' '.join([c[0] for c in chunk]))
   return names
+
+def n_most_common_names(names_dict, n):
+  names = []
+  while n > 0:
+    most_pop = max(names_dict.iterkeys(), key=(lambda key: names_dict[key]))
+    names.append(most_pop)
+    names_dict.pop(most_pop)
+    n -= 1
+  return names
+
+
   
 def extract_handles(text):
   return re.findall(r'@(\w+)', text)      
@@ -41,5 +53,11 @@ def remove_tokens(names_dict, tokens):
 def only_bigrams(names_dict):
   for name in names_dict.keys():
     if len(name.split()) != 2:
+      del names_dict[name]
+  return names_dict
+
+def no_monograms(names_dict):
+  for name in names_dict.keys():
+    if len(name.split()) == 1:
       del names_dict[name]
   return names_dict
