@@ -64,84 +64,56 @@ def get_nominees(tweets, queries, winners):
     if 'Actor' in query.tokens or 'Actress' in query.tokens:
       result = get_actor_nominees(tweets, query, winner)
       results.append(result)
-    # elif 'TV' in query.tokens:
-    #   get_tv_nominees(tweets, query)
-    # elif 'Picture' in query.tokens or 'Film' in query.tokens:
-    #   get_movie_nominees(tweets, query)
+    else:
+      result = get_phrase_nominees(tweets, query, winner)
+      results.append(result)
   return results
 
-def get_movie_nominees(tweets, queries):
-  movie_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
-  nomin_tokens = ['nominated', 'nominee', 'nominees', 'nomination', 'should', 'snub', 'lost', 'not', 'beat', 'robbed', 'prediction', 'over', 'better', 'would', 'could', 'hope']
-  results = []
+def get_phrase_nominees(tweets, query, winner):
+  if 'TV' in query.tokens:
+    optional_tokens = ['tv', 'television', 'series']
+  else:
+    optional_tokens = ['motion', 'picture', 'feature', 'film', 'movie']
 
-  queries_set = create_queries_set(queries)
+  query_tokens = [token for token in query.tokens if token.lower() not in optional_tokens]
 
-  for query in queries:
-    query_tokens = [token for token in query.tokens if token.lower() not in movie_tokens]
+  optional_patterns = regex.create_patterns_not_whole(optional_tokens)
+  query_patterns = regex.create_patterns_not_whole(query_tokens)
 
-    movie_patterns = regex.create_patterns(movie_tokens)
-    query_patterns = regex.create_patterns(query_tokens)
-    nomin_patterns = regex.create_patterns(nomin_tokens)
+  query_tweets = regex.all_match(tweets, query_patterns)
+  if len(optional_tokens) > 0:
+    optional_tweets = regex.any_match(query_tweets, optional_patterns)
+  else:
+    optional_tweets = query_tweets
 
-    query_tweets = regex.all_match(tweets, query_patterns)
-    movie_tweets = query_tweets # regex.any_match(query_tweets, movie_patterns)
-    nominee_tweets = regex.any_match(movie_tweets,nomin_patterns)
+  nominee_patterns = [r'(?i)nomin']
 
-    # unigrams = phrases.extract_ngrams(nominee_tweets, 1)
-    #bigrams = phrases.extract_ngrams(nominee_tweets, 2)
-    #trigrams = phrases.extract_ngrams(nominee_tweets, 3)
+  award_nominee_tweets = regex.any_match(optional_tweets, nominee_patterns)
+  winner_pattern = regex.create_patterns_not_whole([winner.value])
+  winner_tweets = regex.all_match(tweets, winner_pattern)
 
-    # uc = Counter(unigrams)
-    # bc = Counter(bigrams)
-    # tc = Counter(trigrams)
+  should_patterns = [r'(?i)should', r'(?i)snub', r'(?i)lost', r'(?i)beat', r'(?i)robbed', r'(?i)predict', r'(?i)over', r'(?i)hope']
+  winner_nominee_tweets = regex.any_match(winner_tweets, should_patterns)
 
-    ############3
-    # matched_tweets = regex.all_match(tweets, query.get_patterns())
-    other_queries = queries_set.difference(query.tokens)
-    other_queries_patterns = regex.create_patterns(other_queries)
-    nominee_tweets = regex.exclude_any_match(nominee_tweets, other_queries_patterns)
+  all_nominee_tweets = winner_nominee_tweets + award_nominee_tweets
+  max_ngrams = []
+  for i in range(1, 6):
+    ngrams = phrases.extract_ngrams(all_nominee_tweets, i)
+    phrases.remove_query(ngrams, query)
+    phrases.remove_stopwords(ngrams)
+    phrases.remove_twitter_stopwords(ngrams)
+    remove_list = ['should','snub', 'lost','beat','robbed', 'predict','over','hope','nominee','nominated','nominees'] + query.tokens + winner.value.split()
+    phrases.remove_keywords(ngrams,remove_list)
+    ngrams_count = Counter(ngrams)
+    max_ngrams.append(ngrams_count.most_common(2))
 
-    ####
-    max_ngrams = []
-    for i in range(1, 6):
-      ngrams = phrases.extract_ngrams(nominee_tweets, i)
-      phrases.remove_query(ngrams, query)
-      phrases.remove_stopwords(ngrams)
-      phrases.remove_twitter_stopwords(ngrams)
-      phrases.remove_punctuation(ngrams)
-      phrases.remove_keywords(ngrams,nomin_tokens)
-      ngrams_count = Counter(ngrams)
-      max_ngrams.append(ngrams_count.most_common(20))
-
-    for unigram in max_ngrams[0]:
-      for i in range(1, 5): 
-        phrases.add_mention_hashtag_count(unigram, max_ngrams[i], mention_hashtag_weight)
-
-    for ngrams in max_ngrams:
-      ngrams.sort(key=lambda x: x[1], reverse=True)
-
-    print "-----"
-
-    finalStr = ' '
-    for rank in range(0,10):
-      finalStr = '\n' + finalStr + str(rank) + ': '
-      winner = 'none'
-      for i in range(0, 5):
-        if (i+1 >= len(max_ngrams) or len(max_ngrams[i]) <= rank or len(max_ngrams[i+1]) <= rank):
-          continue
-        if i < 4 and ngram_threshold * max_ngrams[i][rank][1] > max_ngrams[i+1][rank][1]:
-          winner = ' '.join(max_ngrams[i][rank][0])
-          break
-        else:
-          winner = ' '.join(max_ngrams[i][rank][0])
-      finalStr = finalStr + winner + '\n'
-    results.append(Result(query.unparsed, finalStr))
-    print finalStr
-  return results
-
-def get_tv_nominees(tweets, query):
-  tv_tokens = ['tv', 'television', 'series']
+  nominees_list = []
+  for ngram in max_ngrams:
+    ngram_list = [name[0] for name in ngram]
+    ngram_phrases = [' '.join(ni) for ni in ngram_list]
+    nominees_list += ngram_phrases
+  nominees_value = ', '.join(nominees_list)
+  return Result(query.unparsed, nominees_value)
 
 def get_actor_nominees(tweets, query, winner):
   if 'TV' in query.tokens:
